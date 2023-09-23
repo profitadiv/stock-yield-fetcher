@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		 <title>Stock Price Lookup</title>
+	</head>
+	<body>
+		 <form action="/stock-info-lookup" method="post">
+			   <input type="text" name="ticker" placeholder="Enter ticker">
+			     <button type="submit">Submit</button>
+			      </form>
+
+			       <table id="results">
+				         <thead>
+						    <tr>
+							        <th>Ticker</th>
+								    <th>Price</th>
+								        <th>Dividend Yield</th>
+									   </tr>
+									     </thead>
+									       <tbody>
+										         </tbody>
+											  </table>
+
+											   <script>
+												     const log = console.log;
+
+												       async function fetchStockInfo(ticker) {
+													           log(`Fetching stock info for ${ticker}`);
+													           const response = await fetch('/stock-info-lookup', {
+															         method: 'POST',
+															         headers: {
+																	         'Content-Type': 'application/json'
+																	       },
+															         body: JSON.stringify({ ticker: ticker })
+															       });
+
+													           if (!response.ok) {
+															         throw new Error('Failed to fetch stock info');
+															       }
+
+													           const jsonData = await response.json();
+													           return jsonData;
+													         }
+
+												       const form = document.querySelector('form');
+												       form.addEventListener('submit', async (event) => {
+													           event.preventDefault();
+
+													           const ticker = event.target.querySelector('input[name="ticker"]').value;
+													           try {
+															         const stockInfo = await fetchStockInfo(ticker);
+															         log(`Price for ${ticker} is ${stockInfo.currentValue} and dividend yield is ${stockInfo.yield}%`);
+
+															         const resultsTable = document.querySelector('#results tbody');
+															         const newRow = document.createElement('tr');
+
+															         newRow.appendChild(document.createElement('td')).textContent = ticker;
+															         newRow.appendChild(document.createElement('td')).textContent = stockInfo.currentValue;
+															         newRow.appendChild(document.createElement('td')).textContent = `${stockInfo.yield}%`;
+
+															         resultsTable.appendChild(newRow);
+															       } catch (error) {
+																             log(error.message);
+																           }
+													         });
+												      </script>
+	</body>
+</html>
+
